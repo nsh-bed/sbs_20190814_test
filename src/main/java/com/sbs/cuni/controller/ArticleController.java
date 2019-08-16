@@ -141,6 +141,7 @@ public class ArticleController {
 			long boardId, HttpServletRequest req) {
 		// String referer = req.getHeader("referer");
 		long loginedMemberId = (long) session.getAttribute("loginedMemberId");
+		
 		Map<String, Object> checkModifyPermmisionRs = articleService.checkModifyPermmision(id, loginedMemberId);
 
 		if (((String) checkModifyPermmisionRs.get("resultCode")).startsWith("F-")) {
@@ -168,8 +169,27 @@ public class ArticleController {
 	}
 
 	@RequestMapping("/article/doDelete")
-	public String doDelete(Model model, @RequestParam Map<String, Object> param, HttpSession session, long id, long boardId) {
+	public String doDelete(Model model, @RequestParam Map<String, Object> param, HttpSession session, long id, long boardId, HttpServletRequest request) {
 		param.put("id", id);
+		
+		boolean hasAPermmision = true;
+
+		Member loginedMember = (Member)request.getAttribute("loginedMember");
+
+		Article article = articleService.getOne(Maps.of("id", id));
+		boolean isWriter = article.getMemberId() == loginedMember.getId();
+
+		if ( loginedMember.getPermissionLevel() == 0 && isWriter == false ) {
+			hasAPermmision = false;
+		}
+
+		if ( hasAPermmision == false ) {
+			model.addAttribute("alertMsg", "권한이 없습니다.");
+			model.addAttribute("historyBack", true);
+
+			return "common/redirect";
+		}
+
 
 		Map<String, Object> deleteRs = articleService.delete(param);
 
@@ -214,8 +234,8 @@ public class ArticleController {
 	@RequestMapping("/article/doDeleteReply")
 	@ResponseBody
 	public Map<String, Object> doDeleteReply(Model model, @RequestParam Map<String, Object> param,
-			HttpSession session) {
-
+			HttpSession session) {		
+		
 		long loginedId = (long) session.getAttribute("loginedMemberId");
 		param.put("loginedMemberId", loginedId);
 		Map<String, Object> deleteReplyRs = articleService.deleteReply(param);
@@ -238,7 +258,7 @@ public class ArticleController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		param.put("id", id);
 
 		Map<String, Object> updateRs = articleService.updateReply(param);
