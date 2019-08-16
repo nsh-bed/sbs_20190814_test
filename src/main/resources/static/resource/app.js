@@ -126,6 +126,8 @@ function Article__drawReply(reply) {
 	var 등록날짜 = reply.regDate;
 	var 댓글번호 = reply.id;
 	var 회원번호 = reply.memberId;
+	var 관리자확인 = loginMemberPermissionLevel;
+	
 	
 	var 내용 = `
 	<div>
@@ -153,16 +155,20 @@ function Article__drawReply(reply) {
 	
 	var 비고 = `
 	<div class="editable-item">
-		<a class="read-mode-visible" href="javascript:;" onclick='Article__enableReplyEditMode(this)'>수정</a>
-		<a class="btn-delete" href="javascript:;" onclick="Article__doDeleteReply(this);">삭제</a>
+		<a class="editable-item read-mode-visible" href="javascript:;" onclick='Article__enableReplyEditMode(this)'>수정</a>
+		<a class="deletable-item btn-delete" href="javascript:;" onclick="Article__doDeleteReply(this);">삭제</a>
 	</div>
 	`;
 	
 	var editableClass = '';
 	
 	if ( 회원번호 == loginedMemberId ) {
-		editableClass = 'editable';
+		editableClass = 'editable deletable';
 	}
+	else if (관리자 확인 == 1) {
+		editableClass = 'deletable';
+	}
+	
 	
 	var html = `
 	<tr data-id="${번호}" data-member-id="${회원번호}" class="${editableClass} add-animation-item add-animation-item-just-added">

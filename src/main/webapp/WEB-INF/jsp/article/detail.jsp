@@ -10,6 +10,10 @@
 </script>
 
 <script>
+	var loginMemberPermissionLevel = ${loginedMember.permissionLevel > 0 ? loginedMember.permissionLevel :0};
+</script>
+
+<script>
 	function enableEditMode(el) {
 		var $el = $(el);
 		var $tr = $el.closest('tr');
@@ -24,12 +28,23 @@
 </script>
 
 <style>
+.deletable-item {
+	display: none;
+}
+.deletable .deletable-item {
+	display: block;
+}
+
 .editable-item {
 	display: none;
 }
 
 .editable .editable-item {
 	display: block;
+}
+
+.editable a.editable-item,.deletable a.deletable-item  {
+	display: inline-block;
 }
 
 .article-replies-list tr .edit-mode-visible {
